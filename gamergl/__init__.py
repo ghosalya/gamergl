@@ -48,13 +48,26 @@ def main():
 
     while game_alive:
         # event checks
+        input_x = 1
+        input_y = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_alive = False
                 pygame.quit()
+        
+        key_pressed = pygame.key.get_pressed()
+        if key_pressed[pygame.K_UP]:
+            input_y += 5
+        if key_pressed[pygame.K_DOWN]:
+            input_y -= 5
+        if key_pressed[pygame.K_LEFT]:
+            input_x -= 5
+        if key_pressed[pygame.K_RIGHT]:
+            input_x += 5
+                
 
         # rotate openGL world by (angle, x, y, z)
-        GL.glRotatef(1, 3, 1, 1)
+        GL.glRotatef(1, input_x, input_y, 1)
         # clear the world?
         GL.glClear(
             GL.GL_COLOR_BUFFER_BIT|GL.GL_DEPTH_BUFFER_BIT
