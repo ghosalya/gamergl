@@ -1,36 +1,15 @@
-from gamergl import GameSession, Unit, UnitAspect, Scene, Body2D, Body2DController
-import OpenGL.GL as GL
+from gamergl import GameSession, Unit, UnitAspect, Scene
+from gamergl.aspects import Body2D, Body2DController
+from gamergl.graphics.geometry2D import square_definition, triangle_definition
 
-square_vertices = (
-    (1, 1),
-    (-1, 1),
-    (-1, -1),
-    (1, -1)
-)
-
-square_edges = (
-    (0, 1),
-    (1, 2),
-    (2, 3),
-    (3, 0)
-)
-
-def square_definition(center, rotation, scale):
-    # for now ignore rotation
-    # lupsup - abrupt change to 3d
-    new_vertices = [
-        (vertex[0] * scale[0] + center[0],
-         vertex[1] * scale[1] + center[1],
-         0)
-        for vertex in square_vertices
-    ]
-
-    GL.glBegin(GL.GL_LINES)
-    for edge in square_edges:
-        for v in edge:
-            vertex = new_vertices[v]
-            GL.glVertex3fv(vertex)
-    GL.glEnd()
+class ConstantRotation(UnitAspect):
+    def __init__(self, unit, body_aspect, rotate_rate):
+        super(ConstantRotation, self).__init__(unit)
+        self.body_aspect = body_aspect
+        self.rotate_rate = rotate_rate
+    
+    def frametick(self, game_input=None):
+        self.body_aspect.rotate(self.rotate_rate)
 
 
 def main():
@@ -48,9 +27,11 @@ def main():
 
     other_unit = Unit(game_scene, "other")
     other_unit_body_aspect = Body2D(other_unit,
-                                    body_definition=square_definition)
+                                    body_definition=triangle_definition)
+    other_unit_rotate_aspect = ConstantRotation(other_unit,
+                                                other_unit_body_aspect,
+                                                2)
     other_unit_body_aspect.translate(1, 2)
-    other_unit_body_aspect.rotate(-12)
 
     game_session.run(game_scene)
 
